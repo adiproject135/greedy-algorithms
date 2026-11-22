@@ -1,15 +1,10 @@
 """Demonstratii Greedy: selectarea activitatilor si problema rucsacului 0/1."""
 
-from dataclasses import dataclass
 from itertools import combinations
 
 
-# Problema selectarii activitatilor
-@dataclass(frozen=True)
-class Activitate:
-    nume: str
-    inceput: int
-    sfarsit: int
+# O activitate este reprezentata printr-un tuplu:
+# (nume, inceput, sfarsit)
 
 
 def selecteaza_activitati(activitati):
@@ -17,42 +12,28 @@ def selecteaza_activitati(activitati):
 
     Complexitate: O(n log n) pentru sortare si O(n) pentru parcurgere.
     """
-    ordonate = sorted(
-        activitati,
-        key=lambda activitate: (
-            activitate.sfarsit,
-            activitate.inceput,
-            activitate.nume,
-        ),
-    )
+    ordonate = sorted(activitati, key=lambda activitate: (activitate[2], activitate[1]))
     selectate = []
     ultimul_sfarsit = None
 
     for activitate in ordonate:
-        if ultimul_sfarsit is None or activitate.inceput >= ultimul_sfarsit:
+        if ultimul_sfarsit is None or activitate[1] >= ultimul_sfarsit:
             selectate.append(activitate)
-            ultimul_sfarsit = activitate.sfarsit
+            ultimul_sfarsit = activitate[2]
 
     return selectate
 
 
 def selectie_compatibila(activitati):
-    ordonate = sorted(
-        activitati,
-        key=lambda activitate: (activitate.inceput, activitate.sfarsit),
-    )
-    return all(
-        anterioara.sfarsit <= urmatoarea.inceput
-        for anterioara, urmatoarea in zip(ordonate, ordonate[1:])
-    )
+    ordonate = sorted(activitati, key=lambda activitate: (activitate[1], activitate[2]))
+    for i in range(1, len(ordonate)):
+        if ordonate[i - 1][2] > ordonate[i][1]:
+            return False
+    return True
 
 
-# Problema rucsacului 0/1: Greedy nu garanteaza intotdeauna optimul
-@dataclass(frozen=True)
-class Obiect:
-    nume: str
-    greutate: int
-    valoare: int
+# Un obiect din rucsac este reprezentat printr-un tuplu:
+# (nume, greutate, valoare)
 
 
 def greedy_dupa_raport(obiecte, capacitate):
@@ -62,19 +43,15 @@ def greedy_dupa_raport(obiecte, capacitate):
     """
     ordonate = sorted(
         obiecte,
-        key=lambda obiect: (
-            -obiect.valoare / obiect.greutate,
-            obiect.greutate,
-            obiect.nume,
-        ),
+        key=lambda obiect: (-obiect[2] / obiect[1], obiect[1]),
     )
     alese = []
     greutate_folosita = 0
 
     for obiect in ordonate:
-        if greutate_folosita + obiect.greutate <= capacitate:
+        if greutate_folosita + obiect[1] <= capacitate:
             alese.append(obiect)
-            greutate_folosita += obiect.greutate
+            greutate_folosita += obiect[1]
 
     return alese
 
@@ -87,8 +64,9 @@ def solutie_optima_brutala(obiecte, capacitate):
 
     for dimensiune in range(len(obiecte) + 1):
         for submultime in combinations(obiecte, dimensiune):
-            greutate = greutate_totala(submultime)
-            valoare = valoare_totala(submultime)
+            greutate = sum(obiect[1] for obiect in submultime)
+            valoare = sum(obiect[2] for obiect in submultime)
+
             if greutate <= capacitate and (
                 valoare > valoare_maxima
                 or (valoare == valoare_maxima and greutate < greutate_minima)
@@ -101,8 +79,8 @@ def solutie_optima_brutala(obiecte, capacitate):
 
 
 def greutate_totala(obiecte):
-    return sum(obiect.greutate for obiect in obiecte)
+    return sum(obiect[1] for obiect in obiecte)
 
 
 def valoare_totala(obiecte):
-    return sum(obiect.valoare for obiect in obiecte)
+    return sum(obiect[2] for obiect in obiecte)
