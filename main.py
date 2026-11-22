@@ -1,94 +1,108 @@
-"""Demonstratii Greedy: Activity Selection si 0/1 Knapsack."""
+"""Demonstratii Greedy: selectarea activitatilor si problema rucsacului 0/1."""
 
 from dataclasses import dataclass
 from itertools import combinations
 
 
-# Activity Selection
+# Problema selectarii activitatilor
 @dataclass(frozen=True)
-class Activity:
-    name: str
-    start: int
-    finish: int
+class Activitate:
+    nume: str
+    inceput: int
+    sfarsit: int
 
 
-def select_activities(activities):
+def selecteaza_activitati(activitati):
     """Selecteaza numarul maxim de activitati compatibile.
 
     Complexitate: O(n log n) pentru sortare si O(n) pentru parcurgere.
     """
-    ordered = sorted(activities, key=lambda a: (a.finish, a.start, a.name))
-    selected = []
-    last_finish = None
+    ordonate = sorted(
+        activitati,
+        key=lambda activitate: (
+            activitate.sfarsit,
+            activitate.inceput,
+            activitate.nume,
+        ),
+    )
+    selectate = []
+    ultimul_sfarsit = None
 
-    for activity in ordered:
-        if last_finish is None or activity.start >= last_finish:
-            selected.append(activity)
-            last_finish = activity.finish
+    for activitate in ordonate:
+        if ultimul_sfarsit is None or activitate.inceput >= ultimul_sfarsit:
+            selectate.append(activitate)
+            ultimul_sfarsit = activitate.sfarsit
 
-    return selected
+    return selectate
 
 
-def is_compatible_selection(activities):
-    ordered = sorted(activities, key=lambda a: (a.start, a.finish))
+def selectie_compatibila(activitati):
+    ordonate = sorted(
+        activitati,
+        key=lambda activitate: (activitate.inceput, activitate.sfarsit),
+    )
     return all(
-        previous.finish <= current.start
-        for previous, current in zip(ordered, ordered[1:])
+        anterioara.sfarsit <= urmatoarea.inceput
+        for anterioara, urmatoarea in zip(ordonate, ordonate[1:])
     )
 
 
-# 0/1 Knapsack: exemplu in care euristica Greedy nu gaseste optimul
+# Problema rucsacului 0/1: Greedy nu garanteaza intotdeauna optimul
 @dataclass(frozen=True)
-class Item:
-    name: str
-    weight: int
-    value: int
+class Obiect:
+    nume: str
+    greutate: int
+    valoare: int
 
 
-def greedy_by_value_density(items, capacity):
+def greedy_dupa_raport(obiecte, capacitate):
     """Alege obiectele dupa raportul valoare/greutate.
 
-    Euristica nu garanteaza optimul pentru problema 0/1 Knapsack.
+    Euristica nu garanteaza optimul pentru problema rucsacului 0/1.
     """
-    ordered = sorted(
-        items,
-        key=lambda item: (-item.value / item.weight, item.weight, item.name),
+    ordonate = sorted(
+        obiecte,
+        key=lambda obiect: (
+            -obiect.valoare / obiect.greutate,
+            obiect.greutate,
+            obiect.nume,
+        ),
     )
-    chosen = []
-    used_weight = 0
+    alese = []
+    greutate_folosita = 0
 
-    for item in ordered:
-        if used_weight + item.weight <= capacity:
-            chosen.append(item)
-            used_weight += item.weight
+    for obiect in ordonate:
+        if greutate_folosita + obiect.greutate <= capacitate:
+            alese.append(obiect)
+            greutate_folosita += obiect.greutate
 
-    return chosen
+    return alese
 
 
-def optimal_by_bruteforce(items, capacity):
+def solutie_optima_brutala(obiecte, capacitate):
     """Cauta solutia exacta prin enumerarea submultimilor (doar pentru exemple mici)."""
-    best = []
-    best_value = 0
-    best_weight = 0
+    cea_mai_buna = []
+    valoare_maxima = 0
+    greutate_minima = 0
 
-    for size in range(len(items) + 1):
-        for subset in combinations(items, size):
-            weight = total_weight(subset)
-            value = total_value(subset)
-            if weight <= capacity and (
-                value > best_value
-                or (value == best_value and weight < best_weight)
+    for dimensiune in range(len(obiecte) + 1):
+        for submultime in combinations(obiecte, dimensiune):
+            greutate = greutate_totala(submultime)
+            valoare = valoare_totala(submultime)
+            if greutate <= capacitate and (
+                valoare > valoare_maxima
+                or (valoare == valoare_maxima and greutate < greutate_minima)
             ):
-                best = list(subset)
-                best_value = value
-                best_weight = weight
+                cea_mai_buna = list(submultime)
+                valoare_maxima = valoare
+                greutate_minima = greutate
 
-    return best
-
-
-def total_weight(items):
-    return sum(item.weight for item in items)
+    return cea_mai_buna
 
 
-def total_value(items):
-    return sum(item.value for item in items)
+def greutate_totala(obiecte):
+    return sum(obiect.greutate for obiect in obiecte)
+
+
+def valoare_totala(obiecte):
+    return sum(obiect.valoare for obiect in obiecte)
