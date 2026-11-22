@@ -2,13 +2,12 @@
 
 Proiect pentru prezentarea tehnicii **Greedy (algoritmi lacomi)**. Problema principala este **Activity Selection**: selectarea numarului maxim de activitati care nu se suprapun.
 
-Proiectul contine explicatia teoretica, un singur fisier Python cu implementarile si un notebook pentru demonstratia live. Sunt incluse si contraexemple care arata de ce nu orice alegere locala produce o solutie optima.
+Proiectul contine explicatia teoretica si un notebook autonom pentru implementare si demonstratia live. Toate functiile Python sunt definite direct in notebook, fara module proprii sau fisiere Python separate.
 
 ## Structura proiectului
 
 ```text
 greedy-algorithms/
-├── main.py
 ├── README.md
 ├── requirements.txt
 ├── notebooks/
@@ -36,7 +35,7 @@ Porniti Jupyter din directorul principal al proiectului:
 jupyter notebook notebooks/greedy_activity_selection.ipynb
 ```
 
-Rulati celulele in ordine, de sus in jos. Implementarile folosite de notebook se afla toate in `main.py`.
+Rulati celulele in ordine, de sus in jos. Implementarile si datele de test sunt definite direct in notebook. Nu este necesar niciun import din fisiere ale proiectului.
 
 ## Problema principala
 

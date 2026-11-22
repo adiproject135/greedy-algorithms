@@ -2,77 +2,83 @@
 
 ## 1. Ce este o strategie Greedy?
 
-Un algoritm Greedy construieste o solutie pas cu pas. La fiecare pas alege varianta care pare cea mai buna conform unui criteriu local, apoi pastreaza alegerea si continua cu problema ramasa.
+Un algoritm Greedy construiește o soluție pas cu pas. La fiecare pas alege varianta care pare cea mai bună conform unui criteriu local, apoi păstrează alegerea și continuă cu problema rămasă.
 
-Caracteristica definitorie este ca algoritmul nu revizuieste in mod normal deciziile anterioare. Din acest motiv, faptul ca o alegere este buna local **nu garanteaza** ca solutia finala este optima.
+Caracteristica definitorie este că algoritmul nu revizuiește, în mod normal, deciziile anterioare. Din acest motiv, faptul că o alegere este bună local **nu garantează** că soluția finală este optimă.
 
-## 2. Doua proprietati importante
+## 2. Două proprietăți importante
 
-- **Greedy-choice property:** exista o solutie optima care contine alegerea locala facuta de algoritm.
-- **Optimal substructure:** dupa fixarea alegerii, partea ramasa a unei solutii optime este o solutie optima pentru subproblema ramasa.
+- **Greedy-choice property (proprietatea alegerii Greedy):** există o soluție optimă care conține alegerea locală făcută de algoritm.
+- **Optimal substructure (substructura optimă):** după fixarea alegerii, partea rămasă a unei soluții optime este o soluție optimă pentru subproblema rămasă.
 
-Aceste proprietati trebuie demonstrate pentru problema concreta. Nu sunt proprietati pe care orice problema le are automat.
+Aceste proprietăți trebuie demonstrate pentru problema concretă. Nu sunt proprietăți pe care orice problemă le are automat.
 
 ## 3. Problema Activity Selection
 
-Avem un set de activitati. Fiecare activitate (a_i) are un timp de inceput (s_i) si un timp de final (f_i), cu (s_i < f_i). Vrem un subset cu cardinalitate maxima, astfel incat activitatile selectate sa nu se suprapuna.
+Avem un set de activități. Fiecare activitate $a_i$ are un timp de început $s_i$ și un timp de final $f_i$, cu $s_i < f_i$. Vrem un subset cu cardinalitate maximă, astfel încât activitățile selectate să nu se suprapună.
 
-Doua activitati consecutive (a_i) si (a_j) sunt compatibile daca:
+Două activități, $a_i$ și $a_j$, sunt compatibile dacă activitatea $a_i$ se termină înainte sau exact când începe activitatea $a_j$:
 
-[
+$$
 f_i \leq s_j
-]
+$$
 
-Folosim intervale semi-deschise ([s_i, f_i)), deci o activitate care se termina la ora 5 poate fi urmata de una care incepe exact la ora 5.
+Folosim intervale semi-deschise $[s_i, f_i)$. Astfel, o activitate care se termină la ora 5 poate fi urmată de una care începe exact la ora 5.
 
 ### Strategia Greedy
 
-1. Sortam activitatile crescator dupa timpul de finalizare.
-2. Alegem prima activitate.
-3. Parcurgem activitatile in aceasta ordine.
-4. Selectam o activitate numai daca incepe dupa sau exact la finalul ultimei activitati selectate.
-5. Continuam pana la epuizarea listei.
+1. Sortăm activitățile crescător după timpul de finalizare.
+2. Alegem prima activitate din lista sortată.
+3. Parcurgem activitățile în această ordine.
+4. Selectăm o activitate numai dacă începe după sau exact la finalul ultimei activități selectate.
+5. Continuăm până la epuizarea listei.
 
 ### Pseudocod
 
 ```text
-GREEDY-ACTIVITY-SELECTION(A):
-    sorteaza A crescator dupa timpul de finalizare
-    S = lista vida
+SELECTARE-ACTIVITATI(A):
+    sortează A crescător după timpul de finalizare
+    S = listă vidă
     ultimul_final = -infinit
 
     pentru fiecare activitate a din A:
-        daca a.start >= ultimul_final:
-            adauga a in S
-            ultimul_final = a.finish
+        dacă a.început >= ultimul_final:
+            adaugă a în S
+            ultimul_final = a.final
 
-    returneaza S
+    returnează S
 ```
 
-## 4. De ce este corecta alegerea „finish cel mai devreme”?
+Inițializarea cu $-\infty$ permite selectarea primei activități din lista sortată.
 
-Fie (g) activitatea care se termina cel mai devreme dintre toate activitatile disponibile. Fie (O) o solutie optima, iar (a) prima activitate din (O), in ordinea cronologica.
+## 4. De ce este corectă alegerea „finalizare cât mai devreme”?
 
-Prin definitie, (g.finish \leq a.finish).
+Fie $g$ activitatea care se termină cel mai devreme dintre toate activitățile disponibile. Fie $O$ o soluție optimă, iar $a$ prima activitate din $O$, în ordinea cronologică.
 
-Daca (O) incepe cu (a), nu avem nimic de demonstrat. Daca incepe cu alta activitate, o putem inlocui pe (a) cu (g):
+Prin definiția lui $g$, avem:
 
-- (g) se termina cel tarziu cand se termina (a);
-- toate activitatile care urmau dupa (a) raman compatibile cu (g);
-- numarul activitatilor selectate nu se schimba.
+$$
+f_g \leq f_a
+$$
 
-Prin urmare, exista cel putin o solutie optima care incepe cu alegerea Greedy (g). Aceasta este proprietatea alegerii Greedy.
+Dacă $O$ începe cu $g$, nu avem nimic de demonstrat. Dacă începe cu altă activitate, o putem înlocui pe $a$ cu $g$:
 
-## 5. De ce putem rezolva problema ramasa la fel?
+- $g$ se termină cel târziu când se termină $a$;
+- toate activitățile care urmau după $a$ rămân compatibile cu $g$;
+- numărul activităților selectate nu se schimbă.
 
-Dupa alegerea lui (g), eliminam toate activitatile care incep inainte de (g.finish). Cele ramase formeaza aceeasi problema, dar cu mai putine activitati.
+Prin urmare, există cel puțin o soluție optimă care începe cu alegerea Greedy $g$. Aceasta demonstrează proprietatea alegerii Greedy.
 
-Daca partea ramasa nu ar fi optima pentru subproblema, am putea inlocui acea parte cu una mai buna si am obtine o solutie mai buna pentru problema initiala. Contradictie cu faptul ca solutia initiala era optima.
+## 5. De ce putem rezolva problema rămasă la fel?
 
-Asadar, subproblema are aceeasi structura si poate fi rezolvata cu aceeasi strategie. Impreuna, proprietatea alegerii Greedy si structura optima a subproblemei justifica algoritmul.
+După alegerea lui $g$, eliminăm toate activitățile care încep înainte de $f_g$. Activitățile rămase formează aceeași problemă, dar cu mai puține activități.
 
-## 6. Observatie importanta
+Dacă partea rămasă nu ar fi optimă pentru subproblemă, am putea înlocui acea parte cu o soluție mai bună și am obține o soluție mai bună pentru problema inițială. Aceasta ar contrazice ipoteza că soluția inițială era optimă.
 
-Greedy nu inseamna „alege orice pare mai bun”. Criteriul trebuie justificat matematic pentru problema respectiva.
+Așadar, subproblema are aceeași structură și poate fi rezolvată cu aceeași strategie. Împreună, proprietatea alegerii Greedy și substructura optimă justifică algoritmul.
 
-Pentru Activity Selection neponderata, alegerea activitatii care se termina cel mai devreme este optima. Pentru varianta ponderata, in care fiecare activitate are un profit si vrem profit total maxim, aceasta regula nu este in general suficienta; se foloseste de obicei programare dinamica.
+## 6. Observație importantă
+
+Greedy nu înseamnă „alege orice pare mai bun”. Criteriul trebuie justificat matematic pentru problema respectivă.
+
+Pentru problema Activity Selection neponderată, alegerea activității care se termină cel mai devreme produce o soluție optimă. Pentru varianta ponderată, în care fiecare activitate are un profit și vrem să maximizăm profitul total, această regulă nu este în general suficientă; se folosește de obicei programarea dinamică.
